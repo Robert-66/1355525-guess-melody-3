@@ -4,10 +4,6 @@ import PropTypes from 'prop-types';
 
 const handleWelcomeButtonClick = () => {};
 
-App.propTypes = {
-  errorsCount: PropTypes.number.isRequired,
-};
-
 function App(props) {
   const {errorsCount} = props;
 
@@ -18,5 +14,9 @@ function App(props) {
     />
   );
 }
+
+App.propTypes = {
+  errorsCount: PropTypes.number.isRequired,
+};
 
 export default App;
