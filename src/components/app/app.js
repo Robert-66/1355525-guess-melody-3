@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 const handleWelcomeButtonClick = () => {};
 
 function App(props) {
-  const {errorsCount} = props;
+  const {errorsCount, questions} = props;
 
   return (
     <BrowserRouter>
@@ -20,7 +20,10 @@ function App(props) {
           />
         </Route>
         <Route exact path="/dev-artist">
-          <ArtistQuestionScreen />
+          <ArtistQuestionScreen
+            question={questions[1]}
+            onAnswer={() => {}}
+          />
         </Route>
         <Route exact path="/dev-genre">
           <GenreQuestionScreen />
