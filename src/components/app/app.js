@@ -7,33 +7,39 @@ import PropTypes from 'prop-types';
 
 const handleWelcomeButtonClick = () => {};
 
-function App(props) {
-  const {errorsCount, questions} = props;
+class App extends React.PureComponent {
+  constructor(props) {
+    super(props);
+  }
 
-  return (
-    <BrowserRouter>
-      <Switch>
-        <Route exact path="/">
-          <WelcomeScreen
-            errorsCount={errorsCount}
-            onClickWelcomeButton={handleWelcomeButtonClick}
-          />
-        </Route>
-        <Route exact path="/dev-artist">
-          <ArtistQuestionScreen
-            question={questions[1]}
-            onAnswer={() => {}}
-          />
-        </Route>
-        <Route exact path="/dev-genre">
-          <GenreQuestionScreen
-            question={questions[0]}
-            onAnswer={() => {}}
-          />
-        </Route>
-      </Switch>
-    </BrowserRouter>
-  );
+  render() {
+    const {errorsCount, questions} = this.props;
+
+    return (
+      <BrowserRouter>
+        <Switch>
+          <Route exact path="/">
+            <WelcomeScreen
+              errorsCount={errorsCount}
+              onClickWelcomeButton={handleWelcomeButtonClick}
+            />
+          </Route>
+          <Route exact path="/dev-artist">
+            <ArtistQuestionScreen
+              question={questions[1]}
+              onAnswer={() => {}}
+            />
+          </Route>
+          <Route exact path="/dev-genre">
+            <GenreQuestionScreen
+              question={questions[0]}
+              onAnswer={() => {}}
+            />
+          </Route>
+        </Switch>
+      </BrowserRouter>
+    );
+  }
 }
 
 App.propTypes = {
