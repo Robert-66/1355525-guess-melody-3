@@ -26,7 +26,10 @@ function App(props) {
           />
         </Route>
         <Route exact path="/dev-genre">
-          <GenreQuestionScreen />
+          <GenreQuestionScreen
+            question={questions[0]}
+            onAnswer={() => {}}
+          />
         </Route>
       </Switch>
     </BrowserRouter>
