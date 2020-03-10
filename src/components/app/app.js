@@ -4,8 +4,13 @@ import WelcomeScreen from '../welcome-screen/welcome-screen';
 import ArtistQuestionScreen from '../artist-question-screen/artist-question-screen';
 import GenreQuestionScreen from '../genre-question-screen/genre-question-screen';
 import GameScreen from '../game-screen/game-screen';
+import withAudioPlayer from '../../hocs/with-audio-player/with-audio-player.js';
 import {GameType} from '../../const.js';
 import PropTypes from 'prop-types';
+
+
+const GenreQuestionScreenWrapped = withAudioPlayer(GenreQuestionScreen);
+const ArtistQuestionScreenWrapped = withAudioPlayer(ArtistQuestionScreen);
 
 class App extends React.PureComponent {
   constructor(props) {
@@ -50,7 +55,7 @@ class App extends React.PureComponent {
         case GameType.ARTIST:
           return (
             <GameScreen type={question.type}>
-              <ArtistQuestionScreen
+              <ArtistQuestionScreenWrapped
                 question={question}
                 onAnswer={this.handleAnswerChange}
               />
@@ -59,7 +64,7 @@ class App extends React.PureComponent {
         case GameType.GENRE:
           return (
             <GameScreen type={question.type}>
-              <GenreQuestionScreen
+              <GenreQuestionScreenWrapped
                 question={question}
                 onAnswer={this.handleAnswerChange}
               />
@@ -82,7 +87,7 @@ class App extends React.PureComponent {
           </Route>
           <Route exact path="/dev-artist">
             <GameScreen type={questions[1].type}>
-              <ArtistQuestionScreen
+              <ArtistQuestionScreenWrapped
                 question={questions[1]}
                 onAnswer={() => {}}
               />
@@ -90,7 +95,7 @@ class App extends React.PureComponent {
           </Route>
           <Route exact path="/dev-genre">
             <GameScreen type={questions[0].type}>
-              <GenreQuestionScreen
+              <GenreQuestionScreenWrapped
                 question={questions[0]}
                 onAnswer={() => {}}
               />

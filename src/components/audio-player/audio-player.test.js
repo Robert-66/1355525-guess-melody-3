@@ -10,7 +10,7 @@ it(`AudioPlayer is rendered correctly`, () => {
   const tree = renderer
     .create(
         <AudioPlayer
-          isPlaying={false}
+          isActive={false}
           onClickPlayPauseButton={() => {}}
           src={song.src}
         />, {

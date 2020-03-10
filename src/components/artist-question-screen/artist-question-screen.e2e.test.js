@@ -49,6 +49,7 @@ it(`User answer passed to callback in correct format`, () => {
   const artistQuestion = shallow(<ArtistQuestionScreen
     onAnswer={onAnswer}
     question={question}
+    renderPlayer={() => {}}
   />);
 
   const answerInputs = artistQuestion.find(`input`);

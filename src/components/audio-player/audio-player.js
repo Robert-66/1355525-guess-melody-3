@@ -8,7 +8,7 @@ class AudioPlayer extends React.PureComponent {
     this.state = {
       progress: 0,
       isLoading: true,
-      isPlaying: this.props.isPlaying,
+      isPlaying: false,
     };
 
     this.audioRef = createRef();
@@ -37,14 +37,15 @@ class AudioPlayer extends React.PureComponent {
       progress: audio.currentTime
     });
 
+    if (this.props.autoplay) {
+      audio.play();
+    }
   }
 
   componentDidUpdate() {
     const audio = this.audioRef.current;
 
-    if (this.props.isPlaying) {
-      audio.play();
-    } else {
+    if (!this.props.isActive && this.state.isPlaying) {
       audio.pause();
     }
   }
@@ -60,10 +61,17 @@ class AudioPlayer extends React.PureComponent {
   }
 
   handlePlayPauseButtonClick() {
-    this.setState((prevState) => ({
-      isPlaying: !prevState.isPlaying
-    }));
-    this.props.onClickPlayPauseButton();
+    const audio = this.audioRef.current;
+
+    if (!this.props.isActive) {
+      this.props.onClickPlayPauseButton();
+    }
+
+    if (this.state.isPlaying) {
+      audio.pause();
+    } else {
+      audio.play();
+    }
   }
 
   render() {
@@ -78,9 +86,7 @@ class AudioPlayer extends React.PureComponent {
           onClick={this.handlePlayPauseButtonClick}
         />
         <div className="track__status">
-          <audio
-            ref={this.audioRef}
-          />
+          <audio ref={this.audioRef} />
         </div>
       </>
     );
@@ -89,8 +95,9 @@ class AudioPlayer extends React.PureComponent {
 
 AudioPlayer.propTypes = {
   onClickPlayPauseButton: PropTypes.func.isRequired,
-  isPlaying: PropTypes.bool.isRequired,
+  isActive: PropTypes.bool.isRequired,
   src: PropTypes.string.isRequired,
+  autoplay: PropTypes.bool,
 };
 
 export default AudioPlayer;

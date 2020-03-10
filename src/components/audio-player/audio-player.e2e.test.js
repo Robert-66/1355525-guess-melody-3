@@ -12,17 +12,31 @@ const song = {
 beforeEach(() => {
   jest
     .spyOn(window.HTMLMediaElement.prototype, `play`)
-    .mockImplementation(() => {});
+    .mockImplementation(function () {
+      // eslint-disable-next-line no-invalid-this
+      if (this.onplay) {
+        // eslint-disable-next-line no-invalid-this
+        this.onplay();
+      }
+    });
 
   jest
     .spyOn(window.HTMLMediaElement.prototype, `pause`)
-    .mockImplementation(() => {});
+    .mockImplementation(function () {
+      // eslint-disable-next-line no-invalid-this
+      if (this.onpause) {
+        // eslint-disable-next-line no-invalid-this
+        this.onpause();
+      }
+    });
+
 });
+
 
 it(`onClickPlayPauseButton should be called`, () => {
   const handlePlayPauseButtonClick = jest.fn();
   const audioPlayer = mount(<AudioPlayer
-    isPlaying={false}
+    isActive={false}
     onClickPlayPauseButton={handlePlayPauseButtonClick}
     src={song.src}
   />);
@@ -33,9 +47,23 @@ it(`onClickPlayPauseButton should be called`, () => {
   expect(handlePlayPauseButtonClick).toHaveBeenCalledTimes(1);
 });
 
+it(`onPlayPauseButtonClick don't should be called`, () => {
+  const handlePlayPauseButtonClick = jest.fn();
+  const audioPlayer = mount(<AudioPlayer
+    isActive={true}
+    onClickPlayPauseButton={handlePlayPauseButtonClick}
+    src={song.src}
+  />);
+
+  audioPlayer.setState({isLoading: false});
+  audioPlayer.find(`button.track__button`).simulate(`click`);
+
+  expect(handlePlayPauseButtonClick).toHaveBeenCalledTimes(0);
+});
+
 it(`Click on play button should work correctly`, () => {
   const audioPlayer = mount(<AudioPlayer
-    isPlaying={false}
+    isActive={true}
     onClickPlayPauseButton={() => {}}
     src={song.src}
   />);
@@ -51,10 +79,9 @@ it(`Click on play button should work correctly`, () => {
 });
 
 it(`Click on play button should change state correctly`, () => {
-  const handlePlayPauseButtonClick = jest.fn();
   const audioPlayer = mount(<AudioPlayer
-    isPlaying={false}
-    onClickPlayPauseButton={handlePlayPauseButtonClick}
+    isActive={true}
+    onClickPlayPauseButton={() => {}}
     src={song.src}
   />);
   const trackButton = audioPlayer.find(`button.track__button`);
