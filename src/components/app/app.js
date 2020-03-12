@@ -1,5 +1,7 @@
 import React from 'react';
 import {BrowserRouter, Switch, Route} from 'react-router-dom';
+import {connect} from 'react-redux';
+import {ActionCreator} from '../../reducer';
 import WelcomeScreen from '../welcome-screen/welcome-screen';
 import ArtistQuestionScreen from '../artist-question-screen/artist-question-screen';
 import GenreQuestionScreen from '../genre-question-screen/genre-question-screen';
@@ -13,39 +15,21 @@ const GenreQuestionScreenWrapped = withAudioPlayer(GenreQuestionScreen);
 const ArtistQuestionScreenWrapped = withAudioPlayer(ArtistQuestionScreen);
 
 class App extends React.PureComponent {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      step: -1,
-    };
-
-    this.handleWelcomeButtonClick = this.handleWelcomeButtonClick.bind(this);
-    this.handleAnswerChange = this.handleAnswerChange.bind(this);
-  }
-
-  handleWelcomeButtonClick() {
-    this.setState({
-      step: 0,
-    });
-  }
-
-  handleAnswerChange() {
-    this.setState((prevState) => ({
-      step: prevState.step + 1,
-    }));
-  }
-
   renderGameScreen() {
-    const {errorsCount, questions} = this.props;
-    const {step} = this.state;
+    const {
+      errorsCount,
+      questions,
+      onAnswer,
+      onClickWelcomeButton,
+      step,
+    } = this.props;
     const question = questions[step];
 
     if (step === -1 || step >= questions.length) {
       return (
         <WelcomeScreen
           errorsCount={errorsCount}
-          onClickWelcomeButton={this.handleWelcomeButtonClick}
+          onClickWelcomeButton={onClickWelcomeButton}
         />
       );
     }
@@ -57,7 +41,7 @@ class App extends React.PureComponent {
             <GameScreen type={question.type}>
               <ArtistQuestionScreenWrapped
                 question={question}
-                onAnswer={this.handleAnswerChange}
+                onAnswer={onAnswer}
               />
             </GameScreen>
           );
@@ -66,7 +50,7 @@ class App extends React.PureComponent {
             <GameScreen type={question.type}>
               <GenreQuestionScreenWrapped
                 question={question}
-                onAnswer={this.handleAnswerChange}
+                onAnswer={onAnswer}
               />
             </GameScreen>
           );
@@ -110,6 +94,29 @@ class App extends React.PureComponent {
 App.propTypes = {
   errorsCount: PropTypes.number.isRequired,
   questions: PropTypes.array.isRequired,
+  onAnswer: PropTypes.func.isRequired,
+  onClickWelcomeButton: PropTypes.func.isRequired,
+  step: PropTypes.number.isRequired,
 };
 
-export default App;
+function mapStateToProps(state) {
+  return {
+    step: state.step
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onClickWelcomeButton() {
+      dispatch(ActionCreator.incrementStep());
+    },
+    onAnswer() {
+      dispatch(ActionCreator.incrementStep());
+    },
+  };
+}
+
+export {App};
+export default connect(mapStateToProps, mapDispatchToProps)(App);
+
+
