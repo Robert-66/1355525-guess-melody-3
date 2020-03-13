@@ -75,31 +75,182 @@ describe(`Reducer work correctly`, () => {
     });
   });
 
-  it(`Reducer should increment number of errors by a given value`, () => {
+  it(`Reducer should increment current step by 1 if the user answer for artist is correct`, () => {
     expect(reducer({
-      step: -1,
+      step: 0,
       errors: 0,
+      questions,
     }, {
-      type: ActionType.INCREMENT_ERRORS,
-      payload: 1,
+      type: ActionType.USER_ANSWER,
+      payload: {
+        question: {
+          type: `artist`,
+          song: {
+            artist: `correct`,
+            src: ``,
+          },
+          answers: [
+            {
+              artist: `correct`,
+              picture: ``,
+            }, {
+              artist: `incorrect`,
+              picture: ``,
+            }, {
+              artist: `incorrect-2`,
+              picture: ``,
+            },
+          ]
+        },
+        userAnswer: {
+          artist: `correct`,
+          picture: ``,
+        }
+      }
     })).toEqual({
-      step: -1,
-      errors: 1,
+      step: 1,
+      errors: 0,
+      questions,
     });
+  });
+
+  it(`Reducer should increment current step by 0 if the user answer for artist is incorrect`, () => {
     expect(reducer({
-      step: -1,
+      step: 0,
       errors: 0,
+      questions,
     }, {
-      type: ActionType.INCREMENT_ERRORS,
-      payload: 0,
+      type: ActionType.USER_ANSWER,
+      payload: {
+        question: {
+          type: `artist`,
+          song: {
+            artist: `correct`,
+            src: ``,
+          },
+          answers: [
+            {
+              artist: `correct`,
+              picture: ``,
+            }, {
+              artist: `incorrect`,
+              picture: ``,
+            }, {
+              artist: `incorrect-2`,
+              picture: ``,
+            },
+          ]
+        },
+        userAnswer: {
+          artist: `incorrect`,
+          picture: ``,
+        }
+      }
     })).toEqual({
-      step: -1,
+      step: 0,
       errors: 0,
+      questions,
+    });
+  });
+
+  it(`Reducer should increment current step by 1 if the user answer for genre is correct`, () => {
+    expect(reducer({
+      step: 0,
+      errors: 0,
+      questions,
+    }, {
+      type: ActionType.USER_ANSWER,
+      payload: {
+        question: {
+          type: `genre`,
+          genre: `jazz`,
+          answers: [
+            {
+              genre: `rock`,
+              src: ``,
+            }, {
+              genre: `jazz`,
+              src: ``,
+            }, {
+              genre: `blues`,
+              src: ``,
+            }, {
+              genre: `blues`,
+              src: ``,
+            },
+          ]
+        },
+        userAnswer: [false, true, false, false]
+      }
+    })).toEqual({
+      step: 1,
+      errors: 0,
+      questions,
+    });
+  });
+
+  it(`Reducer should increment current step by 0 if the user answer for genre is incorrect`, () => {
+    expect(reducer({
+      step: 0,
+      errors: 0,
+      questions,
+    }, {
+      type: ActionType.USER_ANSWER,
+      payload: {
+        question: {
+          type: `genre`,
+          genre: `jazz`,
+          answers: [
+            {
+              genre: `rock`,
+              src: ``,
+            }, {
+              genre: `jazz`,
+              src: ``,
+            }, {
+              genre: `blues`,
+              src: ``,
+            }, {
+              genre: `blues`,
+              src: ``,
+            },
+          ]
+        },
+        userAnswer: [false, false, false, true]
+      }
+    })).toEqual({
+      step: 0,
+      errors: 0,
+      questions,
     });
   });
 });
 
 describe(`Action creators work correctly`, () => {
+
+  const question = {
+    type: `artist`,
+    song: {
+      artist: `correct`,
+      src: ``,
+    },
+    answers: [
+      {
+        artist: `correct`,
+        picture: ``,
+      }, {
+        artist: `incorrect`,
+        picture: ``,
+      }, {
+        artist: `incorrect-2`,
+        picture: ``,
+      },
+    ]
+  };
+  const userAnswer = {
+    artist: `correct`,
+    picture: ``,
+  };
 
   it(`Action creator for incrementing step returns correct action`, () => {
     expect(ActionCreator.incrementStep()).toEqual({
@@ -108,216 +259,27 @@ describe(`Action creators work correctly`, () => {
     });
   });
 
-  it(`Action creator for incrementing error returns action with 0 payload if answer for artist is correct`, () => {
-    expect(ActionCreator.incrementError({
-      type: `artist`,
-      song: {
-        artist: `correct`,
-        src: ``,
-      },
-      answers: [
-        {
-          artist: `correct`,
-          picture: ``,
-        }, {
-          artist: `incorrect`,
-          picture: ``,
-        }, {
-          artist: `incorrect-2`,
-          picture: ``,
-        },
-      ]
-    }, {
-      artist: `correct`,
-      picture: ``,
-    })).toEqual({
-      type: ActionType.INCREMENT_ERRORS,
-      payload: 0,
-    });
+  it(`Action creator for incrementing errors returns correct action`, () => {
+    expect(ActionCreator
+      .incrementError(question, userAnswer))
+      .toEqual({
+        type: ActionType.INCREMENT_ERRORS,
+        payload: {
+          question,
+          userAnswer,
+        }
+      });
   });
 
-  it(`Action creator for incrementing error returns action with 1 payload if answer for artist is incorrect`, () => {
-    expect(ActionCreator.incrementError({
-      type: `artist`,
-      song: {
-        artist: `correct`,
-        src: ``,
-      },
-      answers: [
-        {
-          artist: `correct`,
-          picture: ``,
-        }, {
-          artist: `incorrect`,
-          picture: ``,
-        }, {
-          artist: `incorrect-2`,
-          picture: ``,
-        },
-      ]
-    }, {
-      artist: `incorrect`,
-      picture: ``,
-    })).toEqual({
-      type: ActionType.INCREMENT_ERRORS,
-      payload: 1,
-    });
-  });
-
-  it(`Action creator for incrementing error returns action with 0 payload if answer for genre is correct`, () => {
-    expect(ActionCreator.incrementError({
-      type: `genre`,
-      genre: `jazz`,
-      answers: [
-        {
-          genre: `rock`,
-          src: ``,
-        }, {
-          genre: `jazz`,
-          src: ``,
-        }, {
-          genre: `blues`,
-          src: ``,
-        }, {
-          genre: `blues`,
-          src: ``,
-        },
-      ]
-    }, [false, true, false, false])).toEqual({
-      type: ActionType.INCREMENT_ERRORS,
-      payload: 0,
-    });
-  });
-
-  it(`Action creator for incrementing error returns action with 1 payload if answer for genre is incorrect`, () => {
-    expect(ActionCreator.incrementError({
-      type: `genre`,
-      genre: `jazz`,
-      answers: [
-        {
-          genre: `blues`,
-          src: ``,
-        }, {
-          genre: `blues`,
-          src: ``,
-        }, {
-          genre: `blues`,
-          src: ``,
-        }, {
-          genre: `blues`,
-          src: ``,
-        },
-      ]
-    }, [true, true, true, true])).toEqual({
-      type: ActionType.INCREMENT_ERRORS,
-      payload: 1,
-    });
-  });
-
-
-  it(`Action creator for user answer returns action with 1 payload if answer for artist is correct`, () => {
-    expect(ActionCreator.userAnswer({
-      type: `artist`,
-      song: {
-        artist: `correct`,
-        src: ``,
-      },
-      answers: [
-        {
-          artist: `correct`,
-          picture: ``,
-        }, {
-          artist: `incorrect`,
-          picture: ``,
-        }, {
-          artist: `incorrect-2`,
-          picture: ``,
-        },
-      ]
-    }, {
-      artist: `correct`,
-      picture: ``,
-    })).toEqual({
-      type: ActionType.INCREMENT_STEP,
-      payload: 1,
-    });
-  });
-
-  it(`Action creator for incrementing user answer action with 0 payload if answer for artist is incorrect`, () => {
-    expect(ActionCreator.userAnswer({
-      type: `artist`,
-      song: {
-        artist: `correct`,
-        src: ``,
-      },
-      answers: [
-        {
-          artist: `correct`,
-          picture: ``,
-        }, {
-          artist: `incorrect`,
-          picture: ``,
-        }, {
-          artist: `incorrect-2`,
-          picture: ``,
-        },
-      ]
-    }, {
-      artist: `incorrect`,
-      picture: ``,
-    })).toEqual({
-      type: ActionType.INCREMENT_STEP,
-      payload: 0,
-    });
-  });
-
-  it(`Action creator for user answer returns action with 1 payload if answer for genre is correct`, () => {
-    expect(ActionCreator.userAnswer({
-      type: `genre`,
-      genre: `jazz`,
-      answers: [
-        {
-          genre: `rock`,
-          src: ``,
-        }, {
-          genre: `jazz`,
-          src: ``,
-        }, {
-          genre: `blues`,
-          src: ``,
-        }, {
-          genre: `blues`,
-          src: ``,
-        },
-      ]
-    }, [false, true, false, false])).toEqual({
-      type: ActionType.INCREMENT_STEP,
-      payload: 1,
-    });
-  });
-
-  it(`Action creator for user answer returns action with 0 payload if answer for genre is incorrect`, () => {
-    expect(ActionCreator.userAnswer({
-      type: `genre`,
-      genre: `jazz`,
-      answers: [
-        {
-          genre: `blues`,
-          src: ``,
-        }, {
-          genre: `blues`,
-          src: ``,
-        }, {
-          genre: `blues`,
-          src: ``,
-        }, {
-          genre: `blues`,
-          src: ``,
-        },
-      ]
-    }, [true, true, true, true])).toEqual({
-      type: ActionType.INCREMENT_STEP,
-      payload: 0,
-    });
+  it(`Action creator for user answer returns correct action`, () => {
+    expect(ActionCreator
+      .userAnswer(question, userAnswer))
+      .toEqual({
+        type: ActionType.USER_ANSWER,
+        payload: {
+          question,
+          userAnswer,
+        }
+      });
   });
 });

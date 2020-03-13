@@ -13,6 +13,7 @@ const initialState = {
 const ActionType = {
   INCREMENT_ERRORS: `INCREMENT_ERRORS`,
   INCREMENT_STEP: `INCREMENT_STEP`,
+  USER_ANSWER: `USER_ANSWER`,
 };
 
 const isArtistAnswerCorrect = (question, userAnswer) => userAnswer.artist === question.song.artist;
@@ -23,44 +24,38 @@ const isGenreAnswerCorrect = (question, userAnswer) => {
   });
 };
 
+const answerIsCorrect = (state, {question, userAnswer}) => {
+  let isCorrect = false;
+
+  switch (question.type) {
+    case GameType.ARTIST:
+      isCorrect = isArtistAnswerCorrect(question, userAnswer);
+      break;
+    case GameType.GENRE:
+      isCorrect = isGenreAnswerCorrect(question, userAnswer);
+      break;
+  }
+
+  return isCorrect;
+};
+
 const ActionCreator = {
   incrementStep: () => ({
     type: ActionType.INCREMENT_STEP,
     payload: 1,
   }),
   userAnswer: (question, userAnswer) => {
-    let answerIsCorrect = false;
-
-    switch (question.type) {
-      case GameType.ARTIST:
-        answerIsCorrect = isArtistAnswerCorrect(question, userAnswer);
-        break;
-      case GameType.GENRE:
-        answerIsCorrect = isGenreAnswerCorrect(question, userAnswer);
-        break;
-    }
-
     return {
-      type: ActionType.INCREMENT_STEP,
-      payload: answerIsCorrect ? 1 : 0,
+      type: ActionType.USER_ANSWER,
+      payload: {question, userAnswer},
     };
   },
   incrementError: (question, userAnswer) => {
-    let answerIsCorrect = false;
-
-    switch (question.type) {
-      case GameType.ARTIST:
-        answerIsCorrect = isArtistAnswerCorrect(question, userAnswer);
-        break;
-      case GameType.GENRE:
-        answerIsCorrect = isGenreAnswerCorrect(question, userAnswer);
-        break;
-    }
-
     return {
       type: ActionType.INCREMENT_ERRORS,
-      payload: answerIsCorrect ? 0 : 1,
+      payload: {question, userAnswer},
     };
+
   },
 };
 
@@ -78,14 +73,21 @@ const reducer = (state = initialState, action) => {
       });
 
     case ActionType.INCREMENT_ERRORS:
-      const errors = state.errors + action.payload;
-
-      if (errors >= state.maxErrors) {
+      if (!answerIsCorrect(state, action.payload) && state.errors + 1 >= state.maxErrors) {
         return initialState;
       }
 
       return extend(state, {
-        errors: state.errors + action.payload,
+        errors: answerIsCorrect(state, action.payload) ? state.errors : state.errors + 1,
+      });
+
+    case ActionType.USER_ANSWER:
+      if (answerIsCorrect(state, action.payload) && state.step + 1 >= state.questions.length) {
+        return initialState;
+      }
+
+      return extend(state, {
+        step: answerIsCorrect(state, action.payload) ? state.step + 1 : state.step,
       });
   }
 
@@ -93,3 +95,4 @@ const reducer = (state = initialState, action) => {
 };
 
 export {reducer, ActionType, ActionCreator};
+
