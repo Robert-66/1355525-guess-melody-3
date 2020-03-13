@@ -1,6 +1,10 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
+import {Provider} from 'react-redux';
+import configureStore from 'redux-mock-store';
 import {App} from './app';
+
+const mockStore = configureStore([]);
 
 const questions = [
   {
@@ -41,15 +45,21 @@ const questions = [
 describe(`Render App`, () => {
 
   it(`Render WelcomeScreen`, () => {
+    const store = mockStore({
+      errors: 0,
+    });
+
     const tree = renderer
       .create(
-          <App
-            errorsCount={3}
-            questions={questions}
-            onAnswer={() => {}}
-            onClickWelcomeButton={() => {}}
-            step={-1}
-          />
+          <Provider store={store}>
+            <App
+              maxErrors={3}
+              questions={questions}
+              onAnswer={() => {}}
+              onClickWelcomeButton={() => {}}
+              step={-1}
+            />
+          </Provider>
       )
       .toJSON();
 
@@ -58,15 +68,21 @@ describe(`Render App`, () => {
   });
 
   it(`Render GenreQuestionScreen`, () => {
+    const store = mockStore({
+      errors: 3,
+    });
+
     const tree = renderer
       .create(
-          <App
-            errorsCount={3}
-            questions={questions}
-            onAnswer={() => {}}
-            onClickWelcomeButton={() => {}}
-            step={0}
-          />,
+          <Provider store={store}>
+            <App
+              maxErrors={3}
+              questions={questions}
+              onAnswer={() => {}}
+              onClickWelcomeButton={() => {}}
+              step={0}
+            />
+          </Provider>,
           {
             createNodeMock: () => {
               return {};
@@ -79,15 +95,31 @@ describe(`Render App`, () => {
   });
 
   it(`Render ArtistQuestionScreen`, () => {
+    jest
+      .spyOn(window.HTMLMediaElement.prototype, `play`)
+      .mockImplementation(function () {
+        // eslint-disable-next-line no-invalid-this
+        if (this.onplay) {
+          // eslint-disable-next-line no-invalid-this
+          this.onplay();
+        }
+      });
+
+    const store = mockStore({
+      errors: 3,
+    });
+
     const tree = renderer
       .create(
-          <App
-            errorsCount={3}
-            questions={questions}
-            onAnswer={() => {}}
-            onClickWelcomeButton={() => {}}
-            step={1}
-          />,
+          <Provider store={store}>
+            <App
+              maxErrors={3}
+              questions={questions}
+              onAnswer={() => {}}
+              onClickWelcomeButton={() => {}}
+              step={1}
+            />
+          </Provider>,
           {
             createNodeMock: () => {
               return document.createElement(`audio`);

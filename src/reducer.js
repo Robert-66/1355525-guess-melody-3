@@ -28,6 +28,23 @@ const ActionCreator = {
     type: ActionType.INCREMENT_STEP,
     payload: 1,
   }),
+  userAnswer: (question, userAnswer) => {
+    let answerIsCorrect = false;
+
+    switch (question.type) {
+      case GameType.ARTIST:
+        answerIsCorrect = isArtistAnswerCorrect(question, userAnswer);
+        break;
+      case GameType.GENRE:
+        answerIsCorrect = isGenreAnswerCorrect(question, userAnswer);
+        break;
+    }
+
+    return {
+      type: ActionType.INCREMENT_STEP,
+      payload: answerIsCorrect ? 1 : 0,
+    };
+  },
   incrementError: (question, userAnswer) => {
     let answerIsCorrect = false;
 
